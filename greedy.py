@@ -2,6 +2,7 @@
 """
 Just an example of greedy mesh algorithm in python.
 """
+from pprint import pformat
 
 
 def capture_row_indices(materials, shape_only=False):
@@ -56,6 +57,13 @@ def capture_row_indices(materials, shape_only=False):
     return row_data
 
 
+def generate_points(row_index, row):
+    for start, end in row:
+        start_point = (row_index, start)
+        end_point = (row_index, end)
+        yield [start_point, end_point]
+
+
 def merge_row_indices(rows):
     """Parses each row and merges indices as they are found.
 
@@ -66,14 +74,29 @@ def merge_row_indices(rows):
     ...     [(0, 3)]
     ... ]
     >>> merge_row_indices(rows)
-    [[(0, 0), (0, 3)], [(1, 0), (2, 0)], [(1, 3), (2, 3)], [(3, 0), (3, 3)]
+    [[(0, 0), (0, 3)], [(1, 0), (2, 0)], [(1, 3), (2, 3)], [(3, 0), (3, 3)]]
     """
-    new_grid = []
+    grid = []
     last_row = []
     for row_index, row in enumerate(rows):
-        if row_index > 0:
-            combined = set(last_row + row)
+        if row_index == 0:
+            grid.extend(list(generate_points(row_index, row)))
+        else:
+            filtered = filter(set(row).__contains__, last_row)
+            if filtered:
+                for grid_index, gpairs in enumerate(grid):
+                    gstart, gend = gpairs
+                    for rstart, rend in row:
+                        start = (row_index, rstart)
+                        end = (row_index, rend)
+                        if gstart[-1] == start[-1]:
+                            if gend[0] == end[0] - 1:
+                                grid_entry = grid[grid_index]
+                                grid_entry[-1] = end
+            else:
+                grid.extend(list(generate_points(row_index, row)))
         last_row = row
+    print pformat(grid)
 
 
 def greedy_index(materials, stride=None, dim=None, shape_only=False):
@@ -87,12 +110,6 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
     shape_only will ignore material id and match based on a binary data
     or no data criteria.
 
-    >>> materials = [[2, 1, 1, 2], [2, 0, 0, 2], [2, 0, 0, 2], [2, 1, 1, 2]]
-    >>> greedy_index(materials, shape_only=True)
-    [(0, 4), (7, 8), (11, 15)]
-
-    >>> greedy_index(materials)
-    [(0, 0), (1, 3), (4, 4), (7, 8), (11, 11), (12, 14), (15, 15)]
     """
     rows = []
     for row in materials:
