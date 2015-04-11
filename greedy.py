@@ -109,8 +109,8 @@ def merge_row_indices(rows):
 
 
 def greedy_index(materials, stride=None, dim=None, shape_only=False):
-    """Converts a flat, sparse array of material id's into a mesh that
-    can be sent to the gpu for display.
+    """Converts a flat, sparse array of material id's into an index array
+    that can be manipulated into quads or triangles and sent to gpu.
 
     stride and dimensions can be set to convert the materials from a
     flat list into a multi-dimensional list.  The indices returned will
@@ -136,6 +136,10 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
     ... ]
     >>> greedy_index(materials)
     [[(0, 0), (3, 0)], [(0, 1), (0, 2)], [(0, 3), (3, 3)], [(3, 1), (3, 2)]]
+
+    >>> materials = [2, 1, 1, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 1, 1, 2]
+    >>> greedy_index(materials, stride=4, dim=2, shape_only=True)
+    [[(0, 0), (0, 3)], [(1, 0), (2, 0)], [(1, 3), (2, 3)], [(3, 0), (3, 3)]]
     """
 
     rows = []
@@ -143,6 +147,63 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
         indices = capture_row_indices(row, shape_only)
         rows.append(indices)
     return merge_row_indices(rows)
+
+
+def greedy_triangles(materials, stride=None, dim=None, shape_only=False):
+    """Creates a mesh of triangles from an array of materials
+
+    >>> materials = [
+    ...     [2, 1, 1, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 1, 1, 2],
+    ... ]
+    >>> greedy_triangles(materials, shape_only=True)
+
+    """
+
+
+def greedy_quads(materials, stride=None, dim=None, shape_only=False):
+    """Creates a mesh of quads from an array of materials
+
+    >>> materials = [
+    ...     [2, 1, 1, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 1, 1, 2],
+    ... ]
+    >>> greedy_quads(materials, shape_only=True)
+
+    """
+
+
+def greedy_voxel_triangles(matrials, stride=None, dim=None, shape_only=False):
+    """Creates a mesh of voxel triangles from an array of materials
+
+    >>> materials = [
+    ...     [2, 1, 1, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 1, 1, 2],
+    ... ]
+    >>> greedy_voxel_triangles(materials, shape_only=True)
+
+    """
+
+
+def greedy_voxel_quads(materials, stride=None, dim=None, shape_only=False):
+    """Creates a mesh of voxel quads from an array of materials
+
+    >>> materials = [
+    ...     [2, 1, 1, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 0, 0, 2],
+    ...     [2, 1, 1, 2],
+    ... ]
+    >>> greedy_voxel_quads(materials, shape_only=True)
+
+    """
+
 
 
 if __name__ == "__main__":
