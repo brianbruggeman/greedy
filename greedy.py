@@ -141,6 +141,7 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
     rows = []
     for row in materials:
         indices = capture_row_indices(row, shape_only)
+        print "{} -> {}".format(row, indices)
         rows.append(indices)
     return merge_row_indices(rows)
 
