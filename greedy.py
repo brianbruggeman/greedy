@@ -11,6 +11,22 @@ def capture_row_indices(materials, shape_only=False):
     shape_only provides a method to control binary gap vs no-gap as
     opposed to actual details of materials.  This should provide a close
     to optimal pairing of indices.
+
+    >>> materials = [2, 0, 0, 1]
+    >>> indices = capture_row_indices(materials, shape_only=True)
+    >>> print indices
+    [(0, 0), (3, 3)]
+
+    >>> materials = [1, 2, 2, 1]
+    >>> indices = capture_row_indices(materials, shape_only=True)
+    >>> print indices
+    [(0, 3)]
+
+    >>> materials = [1, 2, 2, 1]
+    >>> indices = capture_row_indices(materials)
+    >>> print indices
+    [(0, 0), (1, 2), (3, 3)]
+
     """
     last = None
     last_idx = None
@@ -38,6 +54,16 @@ def capture_row_indices(materials, shape_only=False):
     return row_data
 
 
+def merge_row_indices(rows):
+    """Parses each row and merges indices as they are found."""
+    new_grid = []
+    last_row = []
+    for row_index, row in enumerate(rows):
+        if row_index > 0:
+            combined = set(last_row + row)
+        last_row = row
+
+
 def greedy_index(materials, stride=None, dim=None, shape_only=False):
     """Converts a flat, sparse array of material id's into a mesh that
     can be sent to the gpu for display.
@@ -49,15 +75,13 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
     shape_only will ignore material id and match based on a binary data
     or no data criteria.
 
-    >>> materials = [2, 1, 1, 1, 2, 0, 0, 2, 2, 0, 0, 2, 1, 1, 1, 2]
-    >>> indices = greedy_index(materials, shape_only=True)
-    >>> print indices
-    [(0, 4), (7, 8), (11, 15)]
-    >>> indices = greedy_index(materials)
-    >>> print indices
-    [(0, 0), (1, 3), (4, 4), (7, 8), (11, 11), (12, 14), (15, 15)]
     """
-    return capture_row_indices(materials, shape_only)
+    rows = []
+    for row in materials:
+        indices = capture_row_indices(materials, shape_only)
+        rows.append(indices)
+    grid = merge_row_indices(rows)
+    return grid
 
 
 if __name__ == "__main__":
