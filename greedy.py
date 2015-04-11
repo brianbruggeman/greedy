@@ -13,13 +13,15 @@ def capture_row_indices(materials, shape_only=False):
     to optimal pairing of indices.
 
     >>> materials = [2, 0, 0, 1]
-    >>> indices = capture_row_indices(materials, shape_only=True)
-    >>> print indices
+    >>> capture_row_indices(materials, shape_only=True)
+    [(0, 0), (3, 3)]
+
+    >>> materials = [2, 0, 0, 1]
+    >>> capture_row_indices(materials)
     [(0, 0), (3, 3)]
 
     >>> materials = [1, 2, 2, 1]
-    >>> indices = capture_row_indices(materials, shape_only=True)
-    >>> print indices
+    >>> capture_row_indices(materials, shape_only=True)
     [(0, 3)]
 
     >>> materials = [1, 2, 2, 1]
@@ -55,7 +57,17 @@ def capture_row_indices(materials, shape_only=False):
 
 
 def merge_row_indices(rows):
-    """Parses each row and merges indices as they are found."""
+    """Parses each row and merges indices as they are found.
+
+    >>> rows = [
+    ...     [(0, 3)],
+    ...     [(0, 0), (3, 3)],
+    ...     [(0, 0), (3, 3)],
+    ...     [(0, 3)]
+    ... ]
+    >>> merge_row_indices(rows)
+    [[(0, 0), (0, 3)], [(1, 0), (2, 0)], [(1, 3), (2, 3)], [(3, 0), (3, 3)]
+    """
     new_grid = []
     last_row = []
     for row_index, row in enumerate(rows):
@@ -75,6 +87,12 @@ def greedy_index(materials, stride=None, dim=None, shape_only=False):
     shape_only will ignore material id and match based on a binary data
     or no data criteria.
 
+    >>> materials = [[2, 1, 1, 2], [2, 0, 0, 2], [2, 0, 0, 2], [2, 1, 1, 2]]
+    >>> greedy_index(materials, shape_only=True)
+    [(0, 4), (7, 8), (11, 15)]
+
+    >>> greedy_index(materials)
+    [(0, 0), (1, 3), (4, 4), (7, 8), (11, 11), (12, 14), (15, 15)]
     """
     rows = []
     for row in materials:
