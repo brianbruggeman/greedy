@@ -5,6 +5,13 @@ Just an example of greedy mesh algorithm in python.
 
 
 def capture_row_indices(materials, shape_only=False):
+    """Captures the start and stop indices of an array based on the
+    contents of the array.
+
+    shape_only provides a method to control binary gap vs no-gap as
+    opposed to actual details of materials.  This should provide a close
+    to optimal pairing of indices.
+    """
     last = None
     last_idx = None
     start = None
